@@ -46,6 +46,9 @@ textarea{resize:vertical;min-height:80px}
 .btn{padding:12px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
 .btn-primary{background:var(--orange);color:#fff}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.input-error{border-color:#E53E3E !important;background:#FFF5F5}
+.form-msg{font-size:12.5px;color:#E53E3E;font-weight:600;margin-top:14px;display:none}
+.form-msg.show{display:block}
 .btn-secondary{background:#fff;color:var(--gray);border:1.5px solid var(--border)}
 .btn-navy{background:var(--navy);color:#fff}
 .btn-block{width:100%;margin-top:10px}
@@ -142,6 +145,7 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
   <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:16%"></div></div>
   <h2 id="step-title"></h2>
   <div id="step-content"></div>
+  <div class="form-msg" id="form-msg">Please complete the required fields on this step before continuing.</div>
   <div class="nav-row">
     <button class="btn btn-secondary" id="btn-back" data-action="back">← Back</button>
     <button class="btn btn-primary" id="btn-next" data-action="next">Continue →</button>
@@ -300,14 +304,26 @@ function renderStep(){
   $("progress-fill").style.width=Math.round(((stepIdx+1)/steps.length)*100)+"%";
   $("btn-back").style.visibility=stepIdx===0?"hidden":"visible";
   $("btn-next").textContent=stepIdx===steps.length-1?"Generate my proposal →":"Continue →";
+  clearErrors();
   bindInputs(); updateNext();
 }
 function bindInputs(){
   document.querySelectorAll("#step-content input, #step-content textarea").forEach(function(el){
-    el.addEventListener("input",function(){steps[stepIdx].collect();updateNext();});
+    el.addEventListener("input",function(){steps[stepIdx].collect();el.classList.remove("input-error");if(steps[stepIdx].valid())clearErrors();updateNext();});
+    el.addEventListener("change",function(){steps[stepIdx].collect();updateNext();}); // catches autofill
   });
 }
-function updateNext(){ steps[stepIdx].collect(); $("btn-next").disabled=!steps[stepIdx].valid(); }
+// Continue is always clickable; validity is enforced on click via showErrors().
+function updateNext(){ steps[stepIdx].collect(); }
+function clearErrors(){ $("form-msg").classList.remove("show"); document.querySelectorAll("#step-content .input-error").forEach(function(e){e.classList.remove("input-error");}); }
+function showErrors(){
+  $("form-msg").classList.add("show");
+  ["f-company","f-contact","f-email"].forEach(function(id){
+    var e=$(id); if(!e)return;
+    var bad = id==="f-email" ? !/\S+@\S+\.\S+/.test(e.value.trim()) : !e.value.trim();
+    e.classList.toggle("input-error",bad);
+  });
+}
 
 /* ---------------- event delegation ---------------- */
 document.addEventListener("click",function(e){
@@ -316,7 +332,8 @@ document.addEventListener("click",function(e){
   if(a==="set-type"){ state.customerType=v; document.querySelectorAll('[data-action="set-type"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); $("welcome-start").disabled=false; }
   if(a==="start"){ stepIdx=0; showPage("page-wizard"); renderStep(); }
   if(a==="back"){ if(stepIdx>0){steps[stepIdx].collect();stepIdx--;renderStep();} }
-  if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid())return;
+  if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid()){showErrors();return;}
+    clearErrors();
     if(stepIdx<steps.length-1){stepIdx++;renderStep();} else {generateResults();} }
   if(a==="toggle-product"){ toggleArr(state.products,v); t.classList.toggle("selected"); updateNext(); }
   if(a==="toggle-goal"){ toggleArr(state.goals,v); t.classList.toggle("selected"); updateNext(); }
