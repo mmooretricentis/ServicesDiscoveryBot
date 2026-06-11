@@ -1,0 +1,12 @@
+{
+  "name": "services-discovery-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tricentis Services Discovery app (static single-page HTML served by a minimal Node server).",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
