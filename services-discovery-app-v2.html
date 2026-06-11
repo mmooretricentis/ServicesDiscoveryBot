@@ -214,10 +214,11 @@ var GOALS = ["Accelerate implementation","Increase test automation","Improve rel
 
 var state = {
   customerType:null, company:"", contact:"", email:"",
-  products:[], erpProject:null, erpApproach:null, erpSystem:"",
+  products:[], deployments:{}, erpProject:null, erpApproach:null, erpSystem:"",
   hasQAOrg:null, teamSize:"", maturity:null, currentTools:"",
   goals:[], timeline:null, notes:""
 };
+var DEPLOY_PRODUCTS = ["Tosca","qTest"]; // products that need an on-prem / cloud choice
 var stepIdx = 0;
 var ai = null; // AI-generated narrative
 
@@ -230,10 +231,17 @@ var steps = [
   }, collect:function(){ state.company=val("f-company"); state.contact=val("f-contact"); state.email=val("f-email"); },
      valid:function(){ return val("f-company") && val("f-contact") && /\S+@\S+\.\S+/.test(val("f-email")); } },
 
-  { title:"Which Tricentis products are in scope?", render:function(){ return ''
+  { title:"Which Tricentis products are in scope?", render:function(){ var h=''
     +'<p class="hint" style="margin-top:0">Select all that apply — '+(state.customerType==='new'?'products you\'re purchasing or evaluating.':'products you own or are adding.')+'</p>'
     +'<div class="chip-row">'+PRODUCTS.map(function(p){return chip(p, state.products.indexOf(p)>=0, "toggle-product");}).join("")+'</div>';
-  }, collect:function(){}, valid:function(){ return state.products.length>0; } },
+    DEPLOY_PRODUCTS.forEach(function(p){
+      if(state.products.indexOf(p)>=0){ h+=''
+        +'<div class="q-label">How will you deploy '+p+'?</div>'
+        +'<div class="chip-row">'+["On-premise","Cloud / SaaS"].map(function(d){return deployChip(p,d);}).join("")+'</div>';
+      }
+    });
+    return h;
+  }, collect:function(){}, valid:function(){ return state.products.length>0 && DEPLOY_PRODUCTS.every(function(p){ return state.products.indexOf(p)<0 || state.deployments[p]; }); } },
 
   { title:"Is this tied to an ERP project?", render:function(){ var h=''
     +'<p class="hint" style="margin-top:0">For example, an SAP S/4HANA migration, Oracle, Salesforce, or other major ERP initiative.</p>'
@@ -270,7 +278,7 @@ var steps = [
     +'<p class="hint">Please share your preferred start date for implementation, preferred completion date for implementation, and a few brief details around your target goals — e.g. "We\'d like to achieve X% automation in X months," or "We\'d like to fully migrate our assets onto the Tricentis platform by [month]."</p>'
     +'<textarea id="f-timeline" placeholder="Preferred start date, preferred completion date, and target goals…">'+esc(state.timeline)+'</textarea>'
     +'<div class="q-label">Anything else we should know?</div><textarea id="f-notes" placeholder="Constraints, upcoming milestones, compliance needs, etc.">'+esc(state.notes)+'</textarea>';
-  }, collect:function(){ state.timeline=val("f-timeline"); state.notes=val("f-notes"); }, valid:function(){ return state.goals.length>0 && state.timeline; } }
+  }, collect:function(){ state.timeline=val("f-timeline"); state.notes=val("f-notes"); }, valid:function(){ return state.goals.length>0; } }
 ];
 
 /* ---------------- helpers ---------------- */
@@ -279,6 +287,7 @@ function val(id){var e=$(id);return e?e.value.trim():"";}
 function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
 function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):"";}
 function chip(label,sel,action){return '<button class="chip'+(sel?" selected":"")+'" data-action="'+action+'" data-value="'+esc(label)+'">'+esc(label)+'</button>';}
+function deployChip(product,label){return '<button class="chip'+(state.deployments[product]===label?" selected":"")+'" data-action="set-deploy" data-product="'+esc(product)+'" data-value="'+esc(label)+'">'+esc(label)+'</button>';}
 function optCard(title,desc,group,value,sel){return '<button class="opt-card'+(sel?" selected":"")+'" data-action="opt" data-group="'+group+'" data-value="'+value+'"><div class="radio"></div><div><div class="opt-title">'+title+'</div><div class="opt-desc">'+desc+'</div></div></button>';}
 function rrow(k,v){return '<div class="rk">'+esc(k)+'</div><div class="rv">'+esc(v)+'</div>';}
 function showPage(id){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});$(id).classList.add("active");window.scrollTo(0,0);}
@@ -323,7 +332,8 @@ document.addEventListener("click",function(e){
   if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid()){showErrors();return;}
     clearErrors();
     if(stepIdx<steps.length-1){stepIdx++;renderStep();} else {generateResults();} }
-  if(a==="toggle-product"){ toggleArr(state.products,v); t.classList.toggle("selected"); updateNext(); }
+  if(a==="toggle-product"){ toggleArr(state.products,v); if(state.products.indexOf(v)<0){ delete state.deployments[v]; } renderStep(); }
+  if(a==="set-deploy"){ var dp=t.getAttribute("data-product"); state.deployments[dp]=v; document.querySelectorAll('[data-action="set-deploy"][data-product="'+dp+'"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); updateNext(); }
   if(a==="toggle-goal"){ toggleArr(state.goals,v); t.classList.toggle("selected"); updateNext(); }
   if(a==="set-maturity"){ state.maturity=v; selectOne('[data-action="set-maturity"]',v); updateNext(); }
   if(a==="opt"){ var g=t.getAttribute("data-group");
@@ -377,9 +387,10 @@ function fetchNarrative(recs){
   var prompt="You are a Tricentis services solutions consultant. Based on this discovery questionnaire, write proposal narrative content. Respond ONLY with valid JSON, no markdown fences, with keys: background (2-3 sentences of customer background/context), current (2-3 sentences describing their current QA state and drivers), valueBullets (array of 4 short expected-value bullet strings tied to their goals), nextSteps (array of exactly 2 short next-step strings: reviewing the proposal with stakeholders, and scheduling a scoping call to refine sizing and confirm requirements).\n\nDiscovery data:\n"
     +"Company: "+state.company+" | Scenario: "+(state.customerType==="new"?"new product purchase":"existing implementation")
     +"\nProducts: "+state.products.join(", ")
+    +"\nDeployment: "+(DEPLOY_PRODUCTS.filter(function(p){return state.deployments[p];}).map(function(p){return p+" — "+state.deployments[p];}).join(", ")||"n/a")
     +"\nERP project: "+(state.erpProject==="yes"?("yes, "+state.erpApproach+(state.erpSystem?" "+state.erpSystem:"")):"no")
     +"\nQA org today: "+state.hasQAOrg+" | Maturity: "+(state.maturity||"n/a")+" | Team size: "+(state.teamSize||"n/a")+" | Current tools: "+(state.currentTools||"n/a")
-    +"\nGoals: "+state.goals.join(", ")+" | Timeline: "+state.timeline+" | Notes: "+(state.notes||"n/a")
+    +"\nGoals: "+state.goals.join(", ")+" | Timeline: "+(state.timeline||"n/a")+" | Notes: "+(state.notes||"n/a")
     +"\nRecommended: "+recs.map(function(r){return r.name;}).join("; ");
   return fetch(CLAUDE_PROXY,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})})
@@ -396,7 +407,7 @@ function fetchNarrative(recs){
 function fallbackNarrative(recs){
   return {
     background: state.company+" is "+(state.customerType==="new"?"investing in "+state.products.join(", ")+" to modernize its quality engineering practice":"expanding its existing Tricentis implementation")+(state.erpProject==="yes"?", in support of a "+state.erpApproach+" ERP initiative"+(state.erpSystem?" on "+state.erpSystem:""):"")+".",
-    current: (state.hasQAOrg==="yes"?"An established QA organization is in place":"Testing is currently handled without a dedicated QA organization")+(state.maturity?", with automation maturity described as \""+state.maturity+"\"":"")+(state.currentTools?" and current tooling including "+state.currentTools:"")+". Key drivers include "+state.goals.slice(0,3).join(", ").toLowerCase()+", with a target timeline of "+state.timeline.toLowerCase()+".",
+    current: (state.hasQAOrg==="yes"?"An established QA organization is in place":"Testing is currently handled without a dedicated QA organization")+(state.maturity?", with automation maturity described as \""+state.maturity+"\"":"")+(state.currentTools?" and current tooling including "+state.currentTools:"")+". Key drivers include "+state.goals.slice(0,3).join(", ").toLowerCase()+(state.timeline?", with a target timeline of "+state.timeline.toLowerCase():"")+".",
     valueBullets:[
       "Accelerated time-to-value through expert-led implementation and onboarding",
       "Increased team productivity via enablement, training, and best practices",
@@ -454,10 +465,11 @@ function downloadPPTX(){
   s.addText(ai.current,{x:0.6,y:2.9,w:12.1,h:1.4,fontSize:15,color:"1A202C"});
   s.addText([
     {text:"Products in scope:  ",options:{bold:true}},{text:state.products.join(", ")+"\n"},
+    {text:"Deployment:  ",options:{bold:true}},{text:(DEPLOY_PRODUCTS.filter(function(p){return state.deployments[p];}).map(function(p){return p+" — "+state.deployments[p];}).join(", ")||"n/a")+"\n"},
     {text:"ERP project:  ",options:{bold:true}},{text:(state.erpProject==="yes"?cap(state.erpApproach)+(state.erpSystem?" — "+state.erpSystem:""):"No")+"\n"},
     {text:"QA organization:  ",options:{bold:true}},{text:(state.hasQAOrg==="yes"?"Yes":"No")+"   ·   "},
     {text:"Maturity:  ",options:{bold:true}},{text:(state.maturity||"n/a")+"   ·   "},
-    {text:"Timeline:  ",options:{bold:true}},{text:state.timeline}
+    {text:"Timeline:  ",options:{bold:true}},{text:(state.timeline||"n/a")}
   ],{x:0.6,y:4.5,w:12.1,h:1.6,fontSize:13,color:GRAY,fill:{color:"F5F7FA"},margin:10});
 
   // 3 — Why services / value
