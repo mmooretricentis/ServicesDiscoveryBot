@@ -98,10 +98,8 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
   <div class="welcome-banner">
     <h1>Services Discovery</h1>
     <p>This short guided questionnaire walks you through a services scoping and discovery process. Based on your answers, we'll generate a personalized services proposal, executive summary, and supporting materials — so you can understand our initial recommendation, sizing, and scope before we ever get on a call.</p>
+    <p>Our data shows that customers who invest in services accelerate time-to-value, implement faster, and reach adoption and ROI milestones sooner than software-only customers.</p>
   </div>
-
-  <h3>Why pair services with your software?</h3>
-  <p style="margin-bottom:4px">Tricentis recommends a full solution — software plus expert-led services. Our data shows that customers who invest in services accelerate time-to-value, implement faster, and reach adoption and ROI milestones sooner than software-only customers.</p>
 
   <div class="value-grid">
     <div class="value-card"><div class="vc-stat">Faster</div><div class="vc-label">time-to-value with guided implementation and onboarding from day one</div></div>
@@ -121,6 +119,7 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
   </button>
 
   <button class="btn btn-primary btn-block" id="welcome-start" data-action="start" disabled>Get started →</button>
+  <button class="btn btn-secondary btn-block" data-action="dev-fill" style="margin-top:10px;font-size:12px">🧪 Dev: jump to sample proposal (testing)</button>
 </div>
 <footer>Tricentis Services Discovery · Version 2</footer>
 </div>
@@ -316,6 +315,7 @@ document.addEventListener("click",function(e){
   var a=t.getAttribute("data-action"), v=t.getAttribute("data-value");
   if(a==="set-type"){ state.customerType=v; document.querySelectorAll('[data-action="set-type"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); $("welcome-start").disabled=false; }
   if(a==="start"){ stepIdx=0; showPage("page-wizard"); renderStep(); }
+  if(a==="dev-fill"){ devFill(); }
   if(a==="back"){ if(stepIdx>0){steps[stepIdx].collect();stepIdx--;renderStep();} }
   if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid()){showErrors();return;}
     clearErrors();
@@ -359,6 +359,19 @@ function buildRecommendation(){
     desc:"Flexible services credits applied across the Success Services catalogue — enablement, best-practice coaching, assessments, advisory, and specialist activities scoped to your requirements."+advisoryNote,
     reasons:reasons});
   return recs;
+}
+
+/* ---------------- dev helper ---------------- */
+function devFill(){
+  state.customerType="new";
+  state.company="Acme Corp"; state.contact="Jane Smith"; state.email="jane@acme.com";
+  state.products=["Tosca","qTest"]; state.deployments={"Tosca":"Cloud / SaaS","qTest":"On-premise"};
+  state.erpProject="yes"; state.erpApproach="greenfield"; state.erpSystem="SAP S/4HANA";
+  state.hasQAOrg="no"; state.teamSize="5–10"; state.maturity="Just starting"; state.currentTools="Selenium, manual testing";
+  state.goals=["Accelerate implementation","Increase test automation","QA strategy & maturity"];
+  state.timeline="Preferred start Q3 2026, complete by end of 2026; target 60% automation within 6 months.";
+  state.notes="GxP compliance required.";
+  generateResults();
 }
 
 /* ---------------- results / AI ---------------- */
