@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tricentis Services Discovery — v2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --navy:#003865; --navy2:#1B3C6E; --blue:#0070C0; --blue-l:#E8F1F9;
+  --orange:#F26B21; --lime:#C8D400; --ink:#1A202C; --gray:#5A6675;
+  --border:#D9DEE5; --bg:#F5F7FA; --card:#FFFFFF; --radius:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+.page{display:none;min-height:100vh;padding:32px 16px}
+.page.active{display:block}
+.container{max-width:680px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px}
+.container-wide{max-width:860px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:36px}
+h1{font-size:26px;color:var(--navy);margin-bottom:8px}
+h2{font-size:21px;color:var(--navy);margin-bottom:6px}
+h3{font-size:15px;color:var(--navy);margin-bottom:8px}
+p{color:var(--gray);font-size:14px}
+.version-tag{display:inline-block;background:var(--blue-l);color:var(--blue);font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px;vertical-align:middle;margin-left:8px}
+.logo-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.step-counter{font-size:12px;color:var(--gray);font-weight:600}
+.progress-bar{height:5px;background:var(--border);border-radius:3px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:var(--orange);border-radius:3px;transition:width .3s}
+.q-label{font-size:14px;font-weight:600;color:var(--ink);margin:18px 0 10px}
+.q-label:first-of-type{margin-top:4px}
+.hint{font-size:12px;color:var(--gray);margin-top:-6px;margin-bottom:10px}
+input[type=text],input[type=email],textarea,select{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)}
+textarea{resize:vertical;min-height:80px}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:9px 16px;border:1.5px solid var(--border);border-radius:24px;background:#fff;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;transition:all .15s}
+.chip.selected{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.opt-card{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:14px 16px;border:1.5px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;margin-bottom:10px;transition:all .15s}
+.opt-card.selected{border-color:var(--blue);background:var(--blue-l)}
+.opt-card .radio{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.opt-card.selected .radio{border-color:var(--blue)}
+.opt-card.selected .radio::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--blue)}
+.opt-title{font-size:14px;font-weight:700;color:var(--ink)}
+.opt-desc{font-size:12.5px;color:var(--gray);margin-top:2px}
+.nav-row{display:flex;justify-content:space-between;margin-top:28px}
+.btn{padding:12px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--gray);border:1.5px solid var(--border)}
+.btn-navy{background:var(--navy);color:#fff}
+.btn-block{width:100%;margin-top:10px}
+.value-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}
+.value-card{background:var(--blue-l);border-radius:10px;padding:16px;border-top:3px solid var(--orange)}
+.value-card .vc-stat{font-size:22px;font-weight:800;color:var(--navy)}
+.value-card .vc-label{font-size:12px;color:var(--gray);margin-top:4px;line-height:1.4}
+.welcome-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 70%);border-radius:var(--radius);padding:28px;color:#fff;margin-bottom:24px}
+.welcome-banner h1{color:#fff}
+.welcome-banner p{color:#D7E2EE;font-size:14.5px;margin-top:8px}
+.summary-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.summary-block h3{display:flex;align-items:center;gap:8px}
+.summary-block p,.summary-block li{font-size:13.5px;color:var(--ink)}
+.summary-block ul{padding-left:20px;margin-top:6px}
+.summary-block li{margin-bottom:4px}
+.rec-card{border:1.5px solid var(--border);border-left:5px solid var(--orange);border-radius:10px;padding:16px 18px;margin-bottom:12px;background:#fff}
+.rec-card .rc-name{font-weight:800;color:var(--navy);font-size:15px}
+.rec-card .rc-desc{font-size:13px;color:var(--gray);margin-top:4px}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:.4px;text-transform:uppercase}
+.badge-ss{background:#FDEBDF;color:var(--orange)}
+.badge-su{background:var(--blue-l);color:var(--blue)}
+.loading-wrap{text-align:center;padding:60px 20px}
+.spinner{width:42px;height:42px;border:4px solid var(--border);border-top-color:var(--orange);border-radius:50%;margin:0 auto 18px;animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.dl-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+.dl-row .btn{flex:1;min-width:220px}
+.review-grid{display:grid;grid-template-columns:160px 1fr;gap:6px 14px;font-size:13.5px}
+.review-grid .rk{color:var(--gray);font-weight:600}
+.review-grid .rv{color:var(--ink)}
+@media(max-width:560px){.container,.container-wide{padding:24px 18px}.review-grid{grid-template-columns:1fr}}
+.t-logo svg{display:block}
+footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color:var(--gray)}
+</style>
+</head>
+<body>
+
+<!-- ============ WELCOME / VALUE PAGE ============ -->
+<div id="page-welcome" class="page active">
+<div class="container">
+  <div class="logo-row">
+    <div class="t-logo">
+      <svg width="130" height="26" viewBox="0 0 160 32" fill="none">
+        <polygon points="0,0 14,0 14,6 6,6 6,26 14,26 14,32 0,32" fill="#01499B"/>
+        <polygon points="8,12 14,12 14,20 8,20" fill="#01499B"/>
+        <text x="20" y="23" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="19" fill="#01499B" letter-spacing="-0.3">tricentis</text>
+      </svg>
+    </div>
+    <span class="version-tag">DISCOVERY APP · V2</span>
+  </div>
+
+  <div class="welcome-banner">
+    <h1>Services Discovery</h1>
+    <p>This short guided questionnaire walks you through a services scoping and discovery process. Based on your answers, we'll generate a personalized services proposal, executive summary, and supporting materials — so you can understand our initial recommendation, sizing, and scope before we ever get on a call.</p>
+  </div>
+
+  <h3>Why pair services with your software?</h3>
+  <p style="margin-bottom:4px">Tricentis recommends a full solution — software plus expert-led services. Our data shows that customers who invest in services accelerate time-to-value, implement faster, and reach adoption and ROI milestones sooner than software-only customers.</p>
+
+  <div class="value-grid">
+    <div class="value-card"><div class="vc-stat">Faster</div><div class="vc-label">time-to-value with guided implementation and onboarding from day one</div></div>
+    <div class="value-card"><div class="vc-stat">Higher</div><div class="vc-label">team productivity through expert enablement and best practices</div></div>
+    <div class="value-card"><div class="vc-stat">Fewer</div><div class="vc-label">defects and less rework with proven quality engineering methods</div></div>
+    <div class="value-card"><div class="vc-stat">Stronger</div><div class="vc-label">long-term capability — your team learns to run and scale it themselves</div></div>
+  </div>
+
+  <div class="q-label">To get started — are you considering a new Tricentis product, or looking for services to support an existing implementation?</div>
+  <button class="opt-card" data-action="set-type" data-value="new">
+    <div class="radio"></div>
+    <div><div class="opt-title">New product</div><div class="opt-desc">I'm evaluating or purchasing a new Tricentis product.</div></div>
+  </button>
+  <button class="opt-card" data-action="set-type" data-value="existing">
+    <div class="radio"></div>
+    <div><div class="opt-title">Existing implementation</div><div class="opt-desc">I already use Tricentis and want additional services or support.</div></div>
+  </button>
+
+  <button class="btn btn-primary btn-block" id="welcome-start" data-action="start" disabled>Get started →</button>
+</div>
+<footer>Tricentis Services Discovery · Version 2</footer>
+</div>
+
+<!-- ============ WIZARD ============ -->
+<div id="page-wizard" class="page">
+<div class="container">
+  <div class="logo-row">
+    <div class="t-logo">
+      <svg width="110" height="22" viewBox="0 0 160 32" fill="none">
+        <polygon points="0,0 14,0 14,6 6,6 6,26 14,26 14,32 0,32" fill="#01499B"/>
+        <polygon points="8,12 14,12 14,20 8,20" fill="#01499B"/>
+        <text x="20" y="23" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="19" fill="#01499B" letter-spacing="-0.3">tricentis</text>
+      </svg>
+    </div>
+    <span class="step-counter" id="step-counter">1 of 6</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:16%"></div></div>
+  <h2 id="step-title"></h2>
+  <div id="step-content"></div>
+  <div class="nav-row">
+    <button class="btn btn-secondary" id="btn-back" data-action="back">← Back</button>
+    <button class="btn btn-primary" id="btn-next" data-action="next">Continue →</button>
+  </div>
+</div>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="page-results" class="page">
+<div class="container-wide">
+  <div id="results-loading" class="loading-wrap">
+    <div class="spinner"></div>
+    <h2>Building your personalized proposal…</h2>
+    <p>Analyzing your answers and preparing recommendations.</p>
+  </div>
+  <div id="results-body" style="display:none">
+    <div class="logo-row">
+      <div class="t-logo">
+        <svg width="130" height="26" viewBox="0 0 160 32" fill="none">
+          <polygon points="0,0 14,0 14,6 6,6 6,26 14,26 14,32 0,32" fill="#01499B"/>
+          <polygon points="8,12 14,12 14,20 8,20" fill="#01499B"/>
+          <text x="20" y="23" font-family="'Helvetica Neue',Arial,sans-serif" font-weight="700" font-size="19" fill="#01499B" letter-spacing="-0.3">tricentis</text>
+        </svg>
+      </div>
+      <span class="version-tag">DISCOVERY APP · V2</span>
+    </div>
+    <h1 id="results-title">Your Services Recommendation</h1>
+    <p style="margin-bottom:20px">Here's a summary of what you told us and our initial recommendation. Download the full proposal and executive summary below — everything you need to review, share internally, and move forward.</p>
+
+    <div class="summary-block"><h3>Background &amp; context</h3><p id="sum-background"></p></div>
+    <div class="summary-block"><h3>Where you are today</h3><p id="sum-current"></p></div>
+
+    <h3 style="margin:20px 0 10px">Recommended services</h3>
+    <div id="rec-list"></div>
+
+    <div class="summary-block" style="margin-top:18px">
+      <h3>How Success Services works</h3>
+      <p>Success Services is a consumption-based services model. You purchase services credits and deploy them across activities in our services catalogue as your needs require — implementation, enablement, advisory, assessments, coaching, and more. Credits give you flexibility: scope evolves with you, and you only consume what your requirements call for.</p>
+    </div>
+
+    <div class="summary-block"><h3>Expected value</h3><ul id="sum-value"></ul></div>
+    <div class="summary-block"><h3>Suggested next steps</h3><ul id="sum-next"></ul></div>
+
+    <div class="dl-row">
+      <button class="btn btn-navy" data-action="dl-pptx">⬇ Download Proposal (.pptx)</button>
+      <button class="btn btn-navy" data-action="dl-exec">⬇ Download Executive Summary (.doc)</button>
+    </div>
+    <button class="btn btn-secondary btn-block" data-action="restart" style="margin-top:14px">← Start a new discovery</button>
+  </div>
+</div>
+<footer>Tricentis Services Discovery · Version 2</footer>
+</div>
+
+<script>
+/* ================================================================
+   TRICENTIS SERVICES DISCOVERY — VERSION 2
+   Single-file app. Deploy via Netlify Drop.
+   AI proposal narrative: set CLAUDE_PROXY to your Cloudflare
+   Worker URL for production. Falls back to template content if
+   the API is unreachable.
+================================================================ */
+var CLAUDE_PROXY = "https://api.anthropic.com/v1/messages"; // ← replace with Cloudflare Worker URL on Netlify
+
+var PRODUCTS = ["Tosca","qTest","NeoLoad","LiveCompare","AI Workspace / Agentic Solutions","Vera"];
+var GOALS = ["Accelerate implementation","Increase test automation","Improve release quality","Upskill / enable our team","QA strategy & maturity","Performance & scalability","SAP / ERP transformation support","Compliance & validation (GxP)"];
+
+var state = {
+  customerType:null, company:"", contact:"", email:"", industry:"",
+  products:[], erpProject:null, erpApproach:null, erpSystem:"",
+  hasQAOrg:null, teamSize:"", maturity:null, currentTools:"",
+  goals:[], timeline:null, notes:""
+};
+var stepIdx = 0;
+var ai = null; // AI-generated narrative
+
+/* ---------------- steps ---------------- */
+var steps = [
+  { title:"Tell us about you", render:function(){ return ''
+    +'<div class="q-label">Company name *</div><input type="text" id="f-company" value="'+esc(state.company)+'" placeholder="Acme Corp">'
+    +'<div class="q-label">Your name *</div><input type="text" id="f-contact" value="'+esc(state.contact)+'" placeholder="Jane Smith">'
+    +'<div class="q-label">Work email *</div><input type="email" id="f-email" value="'+esc(state.email)+'" placeholder="jane@acme.com">'
+    +'<div class="q-label">Industry</div><input type="text" id="f-industry" value="'+esc(state.industry)+'" placeholder="e.g. Pharmaceuticals, Retail, Banking">';
+  }, collect:function(){ state.company=val("f-company"); state.contact=val("f-contact"); state.email=val("f-email"); state.industry=val("f-industry"); },
+     valid:function(){ return val("f-company") && val("f-contact") && /\S+@\S+\.\S+/.test(val("f-email")); } },
+
+  { title:"Which Tricentis products are in scope?", render:function(){ return ''
+    +'<p class="hint" style="margin-top:0">Select all that apply — '+(state.customerType==='new'?'products you\'re purchasing or evaluating.':'products you own or are adding.')+'</p>'
+    +'<div class="chip-row">'+PRODUCTS.map(function(p){return chip(p, state.products.indexOf(p)>=0, "toggle-product");}).join("")+'</div>';
+  }, collect:function(){}, valid:function(){ return state.products.length>0; } },
+
+  { title:"Is this tied to an ERP project?", render:function(){ var h=''
+    +'<p class="hint" style="margin-top:0">For example, an SAP S/4HANA migration, Oracle, Salesforce, or other major ERP initiative.</p>'
+    +optCard("Yes","This work supports an ERP project or transformation.","erp","yes",state.erpProject==="yes")
+    +optCard("No","No ERP project involved.","erp","no",state.erpProject==="no");
+    if(state.erpProject==="yes"){ h+=''
+      +'<div class="q-label">Is the ERP project greenfield or brownfield?</div>'
+      +optCard("Greenfield","A brand-new implementation built from scratch.","erp-approach","greenfield",state.erpApproach==="greenfield")
+      +optCard("Brownfield","A conversion or upgrade of an existing system.","erp-approach","brownfield",state.erpApproach==="brownfield")
+      +'<div class="q-label">Which ERP system?</div><input type="text" id="f-erpsystem" value="'+esc(state.erpSystem)+'" placeholder="e.g. SAP S/4HANA">';
+    }
+    return h;
+  }, collect:function(){ if(state.erpProject==="yes"){ state.erpSystem=val("f-erpsystem"); } else { state.erpApproach=null; state.erpSystem=""; } },
+     valid:function(){ return state.erpProject==="no" || (state.erpProject==="yes" && state.erpApproach); } },
+
+  { title:"Your QA landscape", render:function(){ return ''
+    +'<div class="q-label" style="margin-top:0">Do you have a QA organization today?</div>'
+    +optCard("Yes","We have a dedicated QA / testing team or function.","qaorg","yes",state.hasQAOrg==="yes")
+    +optCard("No","Testing is handled informally or by other roles.","qaorg","no",state.hasQAOrg==="no")
+    +'<div class="q-label">How would you describe your test automation maturity?</div>'
+    +'<div class="chip-row">'+["Just starting","Some automation","Established","Advanced"].map(function(m){return chip(m, state.maturity===m, "set-maturity");}).join("")+'</div>'
+    +'<div class="q-label">Roughly how many people are involved in testing?</div><input type="text" id="f-teamsize" value="'+esc(state.teamSize)+'" placeholder="e.g. 5–10">'
+    +'<div class="q-label">Current testing tools (if any)</div><input type="text" id="f-tools" value="'+esc(state.currentTools)+'" placeholder="e.g. Selenium, manual testing, HP ALM">';
+  }, collect:function(){ state.teamSize=val("f-teamsize"); state.currentTools=val("f-tools"); },
+     valid:function(){ return state.hasQAOrg && state.maturity; } },
+
+  { title:"Goals & timeline", render:function(){ return ''
+    +'<div class="q-label" style="margin-top:0">What are you trying to achieve? Select all that apply.</div>'
+    +'<div class="chip-row">'+GOALS.map(function(g){return chip(g, state.goals.indexOf(g)>=0, "toggle-goal");}).join("")+'</div>'
+    +'<div class="q-label">When do you need to be up and running?</div>'
+    +'<div class="chip-row">'+["ASAP (0–3 months)","3–6 months","6–12 months","Exploring options"].map(function(t){return chip(t, state.timeline===t, "set-timeline");}).join("")+'</div>'
+    +'<div class="q-label">Anything else we should know?</div><textarea id="f-notes" placeholder="Constraints, upcoming milestones, compliance needs, etc.">'+esc(state.notes)+'</textarea>';
+  }, collect:function(){ state.notes=val("f-notes"); }, valid:function(){ return state.goals.length>0 && state.timeline; } },
+
+  { title:"Review your answers", render:function(){ return ''
+    +'<div class="review-grid">'
+    +rrow("Company",state.company)+rrow("Contact",state.contact+" · "+state.email)
+    +rrow("Industry",state.industry||"—")
+    +rrow("Scenario",state.customerType==="new"?"New product purchase":"Existing implementation")
+    +rrow("Products",state.products.join(", "))
+    +rrow("ERP project",state.erpProject==="yes"?("Yes — "+cap(state.erpApproach)+(state.erpSystem?" ("+state.erpSystem+")":"")):"No")
+    +rrow("QA organization",state.hasQAOrg==="yes"?"Yes":"No")
+    +rrow("Maturity",state.maturity)+rrow("Team size",state.teamSize||"—")
+    +rrow("Current tools",state.currentTools||"—")
+    +rrow("Goals",state.goals.join(", "))+rrow("Timeline",state.timeline)
+    +rrow("Notes",state.notes||"—")
+    +'</div><p style="margin-top:16px">Click <b>Generate my proposal</b> and we\'ll prepare your personalized recommendation, proposal deck, and executive summary.</p>';
+  }, collect:function(){}, valid:function(){ return true; } }
+];
+
+/* ---------------- helpers ---------------- */
+function $(id){return document.getElementById(id);}
+function val(id){var e=$(id);return e?e.value.trim():"";}
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");}
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):"";}
+function chip(label,sel,action){return '<button class="chip'+(sel?" selected":"")+'" data-action="'+action+'" data-value="'+esc(label)+'">'+esc(label)+'</button>';}
+function optCard(title,desc,group,value,sel){return '<button class="opt-card'+(sel?" selected":"")+'" data-action="opt" data-group="'+group+'" data-value="'+value+'"><div class="radio"></div><div><div class="opt-title">'+title+'</div><div class="opt-desc">'+desc+'</div></div></button>';}
+function rrow(k,v){return '<div class="rk">'+esc(k)+'</div><div class="rv">'+esc(v)+'</div>';}
+function showPage(id){document.querySelectorAll(".page").forEach(function(p){p.classList.remove("active");});$(id).classList.add("active");window.scrollTo(0,0);}
+
+/* ---------------- wizard engine ---------------- */
+function renderStep(){
+  var s=steps[stepIdx];
+  $("step-title").textContent=s.title;
+  $("step-content").innerHTML=s.render();
+  $("step-counter").textContent=(stepIdx+1)+" of "+steps.length;
+  $("progress-fill").style.width=Math.round(((stepIdx+1)/steps.length)*100)+"%";
+  $("btn-back").style.visibility=stepIdx===0?"hidden":"visible";
+  $("btn-next").textContent=stepIdx===steps.length-1?"Generate my proposal →":"Continue →";
+  bindInputs(); updateNext();
+}
+function bindInputs(){
+  document.querySelectorAll("#step-content input, #step-content textarea").forEach(function(el){
+    el.addEventListener("input",function(){steps[stepIdx].collect();updateNext();});
+  });
+}
+function updateNext(){ steps[stepIdx].collect(); $("btn-next").disabled=!steps[stepIdx].valid(); }
+
+/* ---------------- event delegation ---------------- */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-action]"); if(!t)return;
+  var a=t.getAttribute("data-action"), v=t.getAttribute("data-value");
+  if(a==="set-type"){ state.customerType=v; document.querySelectorAll('[data-action="set-type"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); $("welcome-start").disabled=false; }
+  if(a==="start"){ stepIdx=0; showPage("page-wizard"); renderStep(); }
+  if(a==="back"){ if(stepIdx>0){steps[stepIdx].collect();stepIdx--;renderStep();} }
+  if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid())return;
+    if(stepIdx<steps.length-1){stepIdx++;renderStep();} else {generateResults();} }
+  if(a==="toggle-product"){ toggleArr(state.products,v); t.classList.toggle("selected"); updateNext(); }
+  if(a==="toggle-goal"){ toggleArr(state.goals,v); t.classList.toggle("selected"); updateNext(); }
+  if(a==="set-maturity"){ state.maturity=v; selectOne('[data-action="set-maturity"]',v); updateNext(); }
+  if(a==="set-timeline"){ state.timeline=v; selectOne('[data-action="set-timeline"]',v); updateNext(); }
+  if(a==="opt"){ var g=t.getAttribute("data-group");
+    if(g==="erp"){ state.erpProject=v; if(v==="no"){state.erpApproach=null;} renderStep(); }
+    if(g==="erp-approach"){ state.erpApproach=v; selectGroup("erp-approach",v); updateNext(); }
+    if(g==="qaorg"){ state.hasQAOrg=v; selectGroup("qaorg",v); updateNext(); }
+  }
+  if(a==="dl-pptx"){ downloadPPTX(); }
+  if(a==="dl-exec"){ downloadExecSummary(); }
+  if(a==="restart"){ location.reload(); }
+});
+function toggleArr(arr,v){var i=arr.indexOf(v); if(i>=0)arr.splice(i,1); else arr.push(v);}
+function selectOne(sel,v){document.querySelectorAll(sel).forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);});}
+function selectGroup(group,v){document.querySelectorAll('[data-group="'+group+'"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);});}
+
+/* ---------------- recommendation engine ---------------- */
+function buildRecommendation(){
+  var recs=[];
+  if(state.customerType==="new"){
+    state.products.forEach(function(p){
+      recs.push({type:"smartstart",name:p+" Smart Start",desc:"Expert-led onboarding and implementation for "+p+" — guided setup, configuration, hands-on training, and an adoption roadmap to get your team productive fast."});
+    });
+  }
+  var units=1, reasons=[];
+  if(state.hasQAOrg==="no"){units++;reasons.push("building QA capability from the ground up");}
+  if(state.maturity==="Just starting"){units++;reasons.push("early automation maturity");}
+  if(state.erpProject==="yes"){units++;reasons.push((state.erpApproach||"ERP")+" ERP project support"+(state.erpSystem?" ("+state.erpSystem+")":""));}
+  if(state.goals.indexOf("QA strategy & maturity")>=0){units++;reasons.push("strategic advisory and QA maturity goals");}
+  if(state.products.length>=3){units++;reasons.push("multi-product scope");}
+  units=Math.min(units,4);
+  var advisoryNote = state.goals.indexOf("QA strategy & maturity")>=0 || state.hasQAOrg==="no"
+    ? " We recommend including advisory activities from the catalogue — such as a maturity assessment, strategic roadmap, and quarterly reviews — delivered through your Success Services credits."
+    : "";
+  recs.push({type:"success",name:"Success Services — "+units+" unit"+(units>1?"s":""),units:units,
+    desc:"Flexible services credits applied across the Success Services catalogue — enablement, best-practice coaching, assessments, advisory, and specialist activities scoped to your requirements."+advisoryNote,
+    reasons:reasons});
+  return recs;
+}
+
+/* ---------------- results / AI ---------------- */
+function generateResults(){
+  showPage("page-results");
+  $("results-loading").style.display="block";
+  $("results-body").style.display="none";
+  var recs=buildRecommendation();
+  fetchNarrative(recs).then(function(n){ ai=n; renderResults(recs); })
+    .catch(function(){ ai=fallbackNarrative(recs); renderResults(recs); });
+}
+
+function fetchNarrative(recs){
+  var prompt="You are a Tricentis services solutions consultant. Based on this discovery questionnaire, write proposal narrative content. Respond ONLY with valid JSON, no markdown fences, with keys: background (2-3 sentences of customer background/context), current (2-3 sentences describing their current QA state and drivers), valueBullets (array of 4 short expected-value bullet strings tied to their goals), nextSteps (array of 3-4 short next-step strings).\n\nDiscovery data:\n"
+    +"Company: "+state.company+" | Industry: "+(state.industry||"n/a")+" | Scenario: "+(state.customerType==="new"?"new product purchase":"existing implementation")
+    +"\nProducts: "+state.products.join(", ")
+    +"\nERP project: "+(state.erpProject==="yes"?("yes, "+state.erpApproach+(state.erpSystem?" "+state.erpSystem:"")):"no")
+    +"\nQA org today: "+state.hasQAOrg+" | Maturity: "+state.maturity+" | Team size: "+(state.teamSize||"n/a")+" | Current tools: "+(state.currentTools||"n/a")
+    +"\nGoals: "+state.goals.join(", ")+" | Timeline: "+state.timeline+" | Notes: "+(state.notes||"n/a")
+    +"\nRecommended: "+recs.map(function(r){return r.name;}).join("; ");
+  return fetch(CLAUDE_PROXY,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})})
+  .then(function(r){if(!r.ok)throw new Error("api");return r.json();})
+  .then(function(d){
+    var text=(d.content||[]).filter(function(c){return c.type==="text";}).map(function(c){return c.text;}).join("\n");
+    var clean=text.replace(/```json|```/g,"").trim();
+    var p=JSON.parse(clean);
+    if(!p.background||!p.current)throw new Error("shape");
+    return p;
+  });
+}
+
+function fallbackNarrative(recs){
+  return {
+    background: state.company+(state.industry?" operates in the "+state.industry+" industry and":"")+" is "+(state.customerType==="new"?"investing in "+state.products.join(", ")+" to modernize its quality engineering practice":"expanding its existing Tricentis implementation")+(state.erpProject==="yes"?", in support of a "+state.erpApproach+" ERP initiative"+(state.erpSystem?" on "+state.erpSystem:""):"")+".",
+    current: (state.hasQAOrg==="yes"?"An established QA organization is in place, ":"Testing is currently handled without a dedicated QA organization, ")+"with automation maturity described as \""+state.maturity+"\""+(state.currentTools?" and current tooling including "+state.currentTools:"")+". Key drivers include "+state.goals.slice(0,3).join(", ").toLowerCase()+", with a target timeline of "+state.timeline.toLowerCase()+".",
+    valueBullets:[
+      "Accelerated time-to-value through expert-led implementation and onboarding",
+      "Increased team productivity via enablement, training, and best practices",
+      "Reduced defects and rework with proven quality engineering methods",
+      "Long-term internal capability — your team learns to run and scale the platform"
+    ],
+    nextSteps:[
+      "Review this proposal and executive summary with your stakeholders",
+      "Schedule a scoping call with your Tricentis team to refine sizing",
+      "Confirm services requirements and finalize the statement of work",
+      "Kick off services delivery aligned to your timeline"
+    ]
+  };
+}
+
+function renderResults(recs){
+  $("results-loading").style.display="none";
+  $("results-body").style.display="block";
+  $("results-title").textContent="Services Recommendation for "+state.company;
+  $("sum-background").textContent=ai.background;
+  $("sum-current").textContent=ai.current;
+  $("rec-list").innerHTML=recs.map(function(r){
+    return '<div class="rec-card"><span class="badge '+(r.type==="smartstart"?"badge-ss":"badge-su")+'">'+(r.type==="smartstart"?"Smart Start":"Success Services")+'</span>'
+      +'<div class="rc-name" style="margin-top:6px">'+esc(r.name)+'</div><div class="rc-desc">'+esc(r.desc)+'</div>'
+      +(r.reasons&&r.reasons.length?'<div class="rc-desc" style="margin-top:6px"><b>Sizing rationale:</b> '+esc(r.reasons.join("; "))+'</div>':'')
+      +'</div>';
+  }).join("");
+  $("sum-value").innerHTML=ai.valueBullets.map(function(b){return "<li>"+esc(b)+"</li>";}).join("");
+  $("sum-next").innerHTML=ai.nextSteps.map(function(b){return "<li>"+esc(b)+"</li>";}).join("");
+}
+
+/* ---------------- PPTX proposal ---------------- */
+var NAVY="003865", ORANGE="F26B21", LIME="C8D400", GRAY="5A6675", LIGHT="E8F1F9";
+function downloadPPTX(){
+  var recs=buildRecommendation();
+  var pptx=new PptxGenJS();
+  pptx.defineLayout({name:"WIDE",width:13.33,height:7.5}); pptx.layout="WIDE";
+
+  function header(slide,title){
+    slide.addShape("rect",{x:0,y:0,w:13.33,h:0.9,fill:{color:NAVY}});
+    slide.addText(title,{x:0.5,y:0.12,w:11,h:0.65,fontSize:22,bold:true,color:"FFFFFF"});
+    slide.addShape("rect",{x:0,y:0.9,w:13.33,h:0.06,fill:{color:ORANGE}});
+    slide.addText("Tricentis · Services Discovery v2",{x:9.6,y:7.05,w:3.5,h:0.3,fontSize:9,color:GRAY,align:"right"});
+  }
+
+  // 1 — Title
+  var s=pptx.addSlide();
+  s.addShape("rect",{x:0,y:0,w:13.33,h:7.5,fill:{color:NAVY}});
+  s.addShape("rect",{x:0,y:5.1,w:13.33,h:0.08,fill:{color:ORANGE}});
+  s.addText("Services Proposal",{x:0.8,y:2.2,w:11.7,h:1,fontSize:40,bold:true,color:"FFFFFF"});
+  s.addText("Prepared for "+state.company,{x:0.8,y:3.3,w:11.7,h:0.6,fontSize:22,color:LIME});
+  s.addText("Generated by Tricentis Services Discovery · "+new Date().toLocaleDateString(),{x:0.8,y:5.4,w:11.7,h:0.4,fontSize:12,color:"D7E2EE"});
+
+  // 2 — Background & context
+  s=pptx.addSlide(); header(s,"Background & Context");
+  s.addText(ai.background,{x:0.6,y:1.3,w:12.1,h:1.4,fontSize:15,color:"1A202C"});
+  s.addText(ai.current,{x:0.6,y:2.9,w:12.1,h:1.4,fontSize:15,color:"1A202C"});
+  s.addText([
+    {text:"Products in scope:  ",options:{bold:true}},{text:state.products.join(", ")+"\n"},
+    {text:"ERP project:  ",options:{bold:true}},{text:(state.erpProject==="yes"?cap(state.erpApproach)+(state.erpSystem?" — "+state.erpSystem:""):"No")+"\n"},
+    {text:"QA organization:  ",options:{bold:true}},{text:(state.hasQAOrg==="yes"?"Yes":"No")+"   ·   "},
+    {text:"Maturity:  ",options:{bold:true}},{text:state.maturity+"   ·   "},
+    {text:"Timeline:  ",options:{bold:true}},{text:state.timeline}
+  ],{x:0.6,y:4.5,w:12.1,h:1.6,fontSize:13,color:GRAY,fill:{color:"F5F7FA"},margin:10});
+
+  // 3 — Why services / value
+  s=pptx.addSlide(); header(s,"Why Tricentis Services — Expected Value");
+  s.addText("Customers who pair services with their software accelerate time-to-value, implement faster, and reach adoption and ROI milestones sooner.",{x:0.6,y:1.2,w:12.1,h:0.7,fontSize:14,italic:true,color:GRAY});
+  ai.valueBullets.forEach(function(b,i){
+    var col=i%2, row=Math.floor(i/2);
+    s.addShape("rect",{x:0.6+col*6.2,y:2.2+row*1.9,w:5.9,h:1.6,fill:{color:LIGHT},line:{color:"D9DEE5"}});
+    s.addShape("rect",{x:0.6+col*6.2,y:2.2+row*1.9,w:0.12,h:1.6,fill:{color:ORANGE}});
+    s.addText(b,{x:0.9+col*6.2,y:2.35+row*1.9,w:5.4,h:1.3,fontSize:13.5,color:"1A202C"});
+  });
+
+  // 4 — Recommended services
+  s=pptx.addSlide(); header(s,"Recommended Services");
+  var rows=[[
+    {text:"Service",options:{bold:true,color:"FFFFFF",fill:{color:NAVY}}},
+    {text:"Description",options:{bold:true,color:"FFFFFF",fill:{color:NAVY}}}
+  ]];
+  recs.forEach(function(r){ rows.push([{text:r.name,options:{bold:true,color:NAVY}},{text:r.desc,options:{fontSize:11}}]); });
+  s.addTable(rows,{x:0.6,y:1.3,w:12.1,colW:[3.6,8.5],fontSize:12,border:{pt:0.5,color:"D9DEE5"},autoPage:false,rowH:0.5,valign:"top"});
+  var ssRec=recs.filter(function(r){return r.type==="success";})[0];
+  if(ssRec&&ssRec.reasons.length){ s.addText([{text:"Sizing rationale: ",options:{bold:true}},{text:ssRec.reasons.join("; ")}],{x:0.6,y:6.1,w:12.1,h:0.6,fontSize:11.5,color:GRAY}); }
+
+  // 5 — How Success Services works
+  s=pptx.addSlide(); header(s,"How Success Services Works");
+  s.addText("Success Services is a consumption-based services model: you purchase services credits and deploy them across activities in the Tricentis services catalogue to meet your requirements.",{x:0.6,y:1.25,w:12.1,h:0.9,fontSize:15,color:"1A202C"});
+  var how=[
+    ["Purchase credits","Buy Success Services units sized to your initial scope — flexible and modular."],
+    ["Choose activities","Apply credits to catalogue activities: implementation, enablement, coaching, assessments, advisory, and specialist services."],
+    ["Consume as needed","Scope evolves with you. Activities are scheduled and delivered as your requirements call for them."],
+    ["Track & adapt","Regular check-ins, consumption reporting, and the flexibility to re-prioritize as your journey progresses."]
+  ];
+  how.forEach(function(h,i){
+    s.addShape("rect",{x:0.6+i*3.18,y:2.5,w:2.95,h:3.4,fill:{color:i%2?LIGHT:"F5F7FA"},line:{color:"D9DEE5"}});
+    s.addShape("rect",{x:0.6+i*3.18,y:2.5,w:2.95,h:0.1,fill:{color:ORANGE}});
+    s.addText(String(i+1),{x:0.75+i*3.18,y:2.75,w:1,h:0.5,fontSize:24,bold:true,color:ORANGE});
+    s.addText(h[0],{x:0.75+i*3.18,y:3.35,w:2.65,h:0.5,fontSize:14,bold:true,color:NAVY});
+    s.addText(h[1],{x:0.75+i*3.18,y:3.9,w:2.65,h:1.8,fontSize:11,color:GRAY});
+  });
+  s.addText("Advisory activities — maturity assessments, strategic roadmaps, quarterly reviews — are part of the Success Services catalogue and consume the same credits.",{x:0.6,y:6.2,w:12.1,h:0.6,fontSize:12,italic:true,color:GRAY});
+
+  // 6 — Next steps
+  s=pptx.addSlide(); header(s,"Suggested Next Steps");
+  ai.nextSteps.forEach(function(n,i){
+    s.addShape("rect",{x:0.6,y:1.5+i*1.2,w:12.1,h:1,fill:{color:i===0?LIGHT:"F5F7FA"},line:{color:"D9DEE5"}});
+    s.addText(String(i+1),{x:0.85,y:1.7+i*1.2,w:0.7,h:0.6,fontSize:20,bold:true,color:ORANGE});
+    s.addText(n,{x:1.6,y:1.62+i*1.2,w:10.9,h:0.8,fontSize:14,color:"1A202C",valign:"middle"});
+  });
+
+  // 7 — FAQ placeholder
+  s=pptx.addSlide(); header(s,"Frequently Asked Questions");
+  s.addShape("rect",{x:0.6,y:1.5,w:12.1,h:5,fill:{color:"F5F7FA"},line:{color:"D9DEE5",dashType:"dash"}});
+  s.addText("FAQ content coming soon",{x:0.6,y:3.3,w:12.1,h:0.6,fontSize:20,bold:true,color:GRAY,align:"center"});
+  s.addText("[ Placeholder — FAQ to be added ]",{x:0.6,y:4,w:12.1,h:0.5,fontSize:13,italic:true,color:GRAY,align:"center"});
+
+  pptx.writeFile({fileName:"Tricentis_Services_Proposal_"+safe(state.company)+".pptx"});
+}
+
+/* ---------------- Executive summary (.doc) ---------------- */
+function downloadExecSummary(){
+  var recs=buildRecommendation();
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>Executive Summary</title>'
+  +'<style>body{font-family:Calibri,Arial,sans-serif;color:#1A202C;font-size:11pt}h1{color:#003865;font-size:20pt;border-bottom:3px solid #F26B21;padding-bottom:6px}h2{color:#003865;font-size:13pt;margin-top:18px}td,th{border:1px solid #D9DEE5;padding:6px 10px;font-size:10.5pt;vertical-align:top}th{background:#003865;color:#fff;text-align:left}.meta{color:#5A6675;font-size:9.5pt}</style></head><body>'
+  +'<h1>Executive Summary — Tricentis Services Proposal</h1>'
+  +'<p class="meta">Prepared for '+esc(state.company)+' · '+esc(state.contact)+' · '+new Date().toLocaleDateString()+' · Generated by Tricentis Services Discovery v2</p>'
+  +'<h2>Background &amp; Context</h2><p>'+esc(ai.background)+'</p><p>'+esc(ai.current)+'</p>'
+  +'<h2>Recommended Services</h2><table cellspacing="0"><tr><th>Service</th><th>Description</th></tr>'
+  +recs.map(function(r){return '<tr><td><b>'+esc(r.name)+'</b></td><td>'+esc(r.desc)+'</td></tr>';}).join("")
+  +'</table>'
+  +'<h2>How Success Services Works</h2><p>Success Services is a consumption-based services model: you purchase services credits and deploy them across activities in the Tricentis services catalogue — implementation, enablement, coaching, assessments, and advisory — to meet your requirements as they evolve.</p>'
+  +'<h2>Expected Value</h2><ul>'+ai.valueBullets.map(function(b){return "<li>"+esc(b)+"</li>";}).join("")+'</ul>'
+  +'<h2>Next Steps</h2><ol>'+ai.nextSteps.map(function(b){return "<li>"+esc(b)+"</li>";}).join("")+'</ol>'
+  +'</body></html>';
+  var blob=new Blob(['\ufeff'+html],{type:"application/msword"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="Tricentis_Executive_Summary_"+safe(state.company)+".doc";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function safe(s){return (s||"Customer").replace(/[^a-z0-9]/gi,"_");}
+</script>
+</body>
+</html>
