@@ -198,12 +198,13 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
 var CLAUDE_PROXY = "https://api.anthropic.com/v1/messages"; // ← replace with Cloudflare Worker URL on Netlify
 
 var PRODUCTS = ["Tosca","qTest","NeoLoad","LiveCompare","AI Workspace / Agentic Solutions","Vera"];
-var GOALS = ["Accelerate implementation","Increase test automation","Improve release quality","Upskill / enable our team","QA strategy & maturity","Performance & scalability","SAP / ERP transformation support","Compliance & validation (GxP)"];
+var GOALS = ["Accelerate implementation","Increase test automation","Improve release quality","Upskill / enable our team","QA strategy & maturity","Performance & scalability","SAP / ERP transformation support","Compliance & validation (GxP)","Unsure"];
 
 var state = {
   customerType:null, company:"", contact:"", email:"",
   products:[], deployments:{}, erpProject:null, erpApproach:null, erpSystem:"",
-  hasQAOrg:null, teamSize:"", maturity:null, currentTools:"",
+  hasQAOrg:null, teamStructure:"", teamSize:"", numTeams:"", maturity:null, currentTools:"",
+  siInvolved:null, siScope:"", qtestMigration:null,
   goals:[], timeline:null, notes:""
 };
 var DEPLOY_PRODUCTS = ["Tosca","qTest"]; // products that need an on-prem / cloud choice
@@ -225,7 +226,7 @@ var steps = [
     DEPLOY_PRODUCTS.forEach(function(p){
       if(state.products.indexOf(p)>=0){ h+=''
         +'<div class="q-label">How will you deploy '+p+'?</div>'
-        +'<div class="chip-row">'+["On-premise","Cloud / SaaS"].map(function(d){return deployChip(p,d);}).join("")+'</div>';
+        +'<div class="chip-row">'+["On-premise","Cloud / SaaS","Unsure"].map(function(d){return deployChip(p,d);}).join("")+'</div>';
       }
     });
     return h;
@@ -236,9 +237,10 @@ var steps = [
     +optCard("Yes","This work supports an ERP project or transformation.","erp","yes",state.erpProject==="yes")
     +optCard("No","No ERP project involved.","erp","no",state.erpProject==="no");
     if(state.erpProject==="yes"){ h+=''
-      +'<div class="q-label">Is the ERP project greenfield or brownfield?</div>'
+      +'<div class="q-label">Is the ERP project greenfield, brownfield, or bluefield?</div>'
       +optCard("Greenfield","A brand-new implementation built from scratch.","erp-approach","greenfield",state.erpApproach==="greenfield")
       +optCard("Brownfield","A conversion or upgrade of an existing system.","erp-approach","brownfield",state.erpApproach==="brownfield")
+      +optCard("Bluefield","A hybrid approach — selective data transition combining a new build with existing data.","erp-approach","bluefield",state.erpApproach==="bluefield")
       +'<div class="q-label">Which ERP system?</div><input type="text" id="f-erpsystem" value="'+esc(state.erpSystem)+'" placeholder="e.g. SAP S/4HANA">';
     }
     return h;
@@ -249,15 +251,28 @@ var steps = [
     +'<div class="q-label" style="margin-top:0">Do you have a QA organization today?</div>'
     +optCard("Yes","We have a dedicated QA / testing team or function.","qaorg","yes",state.hasQAOrg==="yes")
     +optCard("No","Testing is handled informally or by other roles.","qaorg","no",state.hasQAOrg==="no");
+    if(state.hasQAOrg==="yes"){ h+=''
+      +'<div class="q-label">Briefly describe your current team structure and roles</div>'
+      +'<textarea id="f-teamstructure" placeholder="e.g. 2 QA leads, 6 manual testers, 1 automation engineer, reporting into Engineering…">'+esc(state.teamStructure)+'</textarea>'; }
     if(state.products.indexOf("Tosca")>=0){ h+=''
       +'<div class="q-label">How would you describe your test automation maturity?</div>'
-      +'<div class="chip-row">'+["Just starting","Some automation","Established","Advanced"].map(function(m){return chip(m, state.maturity===m, "set-maturity");}).join("")+'</div>'; }
+      +'<div class="chip-row">'+["No Automation","Some automation","Advanced"].map(function(m){return chip(m, state.maturity===m, "set-maturity");}).join("")+'</div>'; }
     h+=''
     +'<div class="q-label">Roughly how many people are involved in testing?</div><input type="text" id="f-teamsize" value="'+esc(state.teamSize)+'" placeholder="e.g. 5–10">'
-    +'<div class="q-label">Current testing tools (if any)</div><input type="text" id="f-tools" value="'+esc(state.currentTools)+'" placeholder="e.g. Selenium, manual testing, HP ALM">';
+    +'<div class="q-label">How many teams will be part of this initial implementation?</div><input type="text" id="f-numteams" value="'+esc(state.numTeams)+'" placeholder="e.g. 3">'
+    +'<div class="q-label">Current testing tools (if any)</div><input type="text" id="f-tools" value="'+esc(state.currentTools)+'" placeholder="e.g. Selenium, manual testing, HP ALM">'
+    +'<div class="q-label">Is a systems integrator (SI) involved?</div>'
+    +'<p class="hint">Typically the vendor would be responsible for onboarding, technical implementation requirements, and Tricentis-related Solution Design/Advisory, at a minimum.</p>'
+    +'<div class="chip-row">'+["Yes","No","Unsure"].map(function(s){return chip(s, state.siInvolved===s, "set-si");}).join("")+'</div>';
+    if(state.siInvolved==="Yes"){ h+=''
+      +'<div class="q-label">What is the SI\'s expected scope?</div>'
+      +'<textarea id="f-siscope" placeholder="Briefly describe what the systems integrator will be responsible for…">'+esc(state.siScope)+'</textarea>'; }
+    if(state.products.indexOf("qTest")>=0){ h+=''
+      +'<div class="q-label">Do you require migration from a legacy test management solution for audit and compliance purposes?</div>'
+      +'<div class="chip-row">'+["Yes","No","Unsure"].map(function(m){return chip(m, state.qtestMigration===m, "set-qtest-migration");}).join("")+'</div>'; }
     return h;
-  }, collect:function(){ state.teamSize=val("f-teamsize"); state.currentTools=val("f-tools"); if(state.products.indexOf("Tosca")<0){ state.maturity=null; } },
-     valid:function(){ return state.hasQAOrg && (state.products.indexOf("Tosca")<0 || state.maturity); } },
+  }, collect:function(){ state.teamSize=val("f-teamsize"); state.numTeams=val("f-numteams"); state.currentTools=val("f-tools"); if(state.hasQAOrg==="yes"){ state.teamStructure=val("f-teamstructure"); } if(state.siInvolved==="Yes"){ state.siScope=val("f-siscope"); } if(state.products.indexOf("Tosca")<0){ state.maturity=null; } },
+     valid:function(){ return state.hasQAOrg && (state.products.indexOf("Tosca")<0 || state.maturity) && state.siInvolved && (state.products.indexOf("qTest")<0 || state.qtestMigration); } },
 
   { title:"Goals & timeline", render:function(){ return ''
     +'<div class="q-label" style="margin-top:0">What are you trying to achieve? Select all that apply.</div>'
@@ -321,15 +336,17 @@ document.addEventListener("click",function(e){
   if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid()){showErrors();return;}
     clearErrors();
     if(stepIdx<steps.length-1){stepIdx++;renderStep();} else {generateResults();} }
-  if(a==="toggle-product"){ toggleArr(state.products,v); if(state.products.indexOf(v)<0){ delete state.deployments[v]; } renderStep(); }
+  if(a==="toggle-product"){ toggleArr(state.products,v); if(state.products.indexOf(v)<0){ delete state.deployments[v]; if(v==="qTest"){state.qtestMigration=null;} if(v==="Tosca"){state.maturity=null;} } renderStep(); }
   if(a==="set-deploy"){ var dp=t.getAttribute("data-product"); state.deployments[dp]=v; document.querySelectorAll('[data-action="set-deploy"][data-product="'+dp+'"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); updateNext(); }
   if(a==="toggle-goal"){ toggleArr(state.goals,v); t.classList.toggle("selected"); updateNext(); }
   if(a==="set-maturity"){ state.maturity=v; selectOne('[data-action="set-maturity"]',v); updateNext(); }
   if(a==="opt"){ var g=t.getAttribute("data-group");
     if(g==="erp"){ state.erpProject=v; if(v==="no"){state.erpApproach=null;} renderStep(); }
     if(g==="erp-approach"){ state.erpApproach=v; selectGroup("erp-approach",v); updateNext(); }
-    if(g==="qaorg"){ state.hasQAOrg=v; selectGroup("qaorg",v); updateNext(); }
+    if(g==="qaorg"){ steps[stepIdx].collect(); state.hasQAOrg=v; if(v!=="yes"){state.teamStructure="";} renderStep(); }
   }
+  if(a==="set-si"){ steps[stepIdx].collect(); state.siInvolved=v; if(v!=="Yes"){state.siScope="";} renderStep(); }
+  if(a==="set-qtest-migration"){ state.qtestMigration=v; selectOne('[data-action="set-qtest-migration"]',v); updateNext(); }
   if(a==="share-email"){ shareByEmail(); }
   if(a==="dl-pptx"){ downloadPPTX(); }
   if(a==="dl-exec"){ downloadExecSummary(); }
@@ -349,7 +366,7 @@ function buildRecommendation(){
   }
   var units=1, reasons=[];
   if(state.hasQAOrg==="no"){units++;reasons.push("building QA capability from the ground up");}
-  if(state.maturity==="Just starting"){units++;reasons.push("early automation maturity");}
+  if(state.maturity==="No Automation"){units++;reasons.push("early automation maturity");}
   if(state.erpProject==="yes"){units++;reasons.push((state.erpApproach||"ERP")+" ERP project support"+(state.erpSystem?" ("+state.erpSystem+")":""));}
   if(state.goals.indexOf("QA strategy & maturity")>=0){units++;reasons.push("strategic advisory and QA maturity goals");}
   if(state.products.length>=3){units++;reasons.push("multi-product scope");}
@@ -379,9 +396,13 @@ function shareByEmail(){
   if(dep) L.push("- Deployment: "+dep);
   L.push("- ERP project: "+(state.erpProject==="yes"?("Yes — "+cap(state.erpApproach)+(state.erpSystem?" ("+state.erpSystem+")":"")):"No"));
   L.push("- QA organization: "+(state.hasQAOrg==="yes"?"Yes":"No"));
+  if(state.teamStructure) L.push("- Team structure & roles: "+state.teamStructure);
   if(state.maturity) L.push("- Automation maturity: "+state.maturity);
   if(state.teamSize) L.push("- Testing team size: "+state.teamSize);
+  if(state.numTeams) L.push("- Teams in initial implementation: "+state.numTeams);
   if(state.currentTools) L.push("- Current tools: "+state.currentTools);
+  if(state.siInvolved) L.push("- Systems integrator involved: "+state.siInvolved+(state.siScope?" — scope: "+state.siScope:""));
+  if(state.qtestMigration) L.push("- qTest legacy migration (audit/compliance): "+state.qtestMigration);
   L.push("- Goals: "+state.goals.join(", "));
   if(state.timeline) L.push("- Timeline: "+state.timeline);
   if(state.notes) L.push("- Notes: "+state.notes);
@@ -402,7 +423,8 @@ function devFill(){
   state.company="Acme Corp"; state.contact="Jane Smith"; state.email="jane@acme.com";
   state.products=["Tosca","qTest"]; state.deployments={"Tosca":"Cloud / SaaS","qTest":"On-premise"};
   state.erpProject="yes"; state.erpApproach="greenfield"; state.erpSystem="SAP S/4HANA";
-  state.hasQAOrg="no"; state.teamSize="5–10"; state.maturity="Just starting"; state.currentTools="Selenium, manual testing";
+  state.hasQAOrg="yes"; state.teamStructure="2 QA leads, 6 manual testers, 1 automation engineer, reporting into Engineering."; state.teamSize="5–10"; state.numTeams="3"; state.maturity="No Automation"; state.currentTools="Selenium, manual testing";
+  state.siInvolved="Yes"; state.siScope="Onboarding, technical implementation, and integration with CI/CD."; state.qtestMigration="Yes";
   state.goals=["Accelerate implementation","Increase test automation","QA strategy & maturity"];
   state.timeline="Preferred start Q3 2026, complete by end of 2026; target 60% automation within 6 months.";
   state.notes="GxP compliance required.";
@@ -425,7 +447,9 @@ function fetchNarrative(recs){
     +"\nProducts: "+state.products.join(", ")
     +"\nDeployment: "+(DEPLOY_PRODUCTS.filter(function(p){return state.deployments[p];}).map(function(p){return p+" — "+state.deployments[p];}).join(", ")||"n/a")
     +"\nERP project: "+(state.erpProject==="yes"?("yes, "+state.erpApproach+(state.erpSystem?" "+state.erpSystem:"")):"no")
-    +"\nQA org today: "+state.hasQAOrg+" | Maturity: "+(state.maturity||"n/a")+" | Team size: "+(state.teamSize||"n/a")+" | Current tools: "+(state.currentTools||"n/a")
+    +"\nQA org today: "+state.hasQAOrg+(state.teamStructure?" (team structure: "+state.teamStructure+")":"")+" | Maturity: "+(state.maturity||"n/a")+" | Team size: "+(state.teamSize||"n/a")+" | Teams in initial implementation: "+(state.numTeams||"n/a")+" | Current tools: "+(state.currentTools||"n/a")
+    +"\nSystems integrator: "+(state.siInvolved||"n/a")+(state.siScope?" — scope: "+state.siScope:"")
+    +"\nqTest legacy migration for audit/compliance: "+(state.qtestMigration||"n/a")
     +"\nGoals: "+state.goals.join(", ")+" | Timeline: "+(state.timeline||"n/a")+" | Notes: "+(state.notes||"n/a")
     +"\nRecommended: "+recs.map(function(r){return r.name;}).join("; ");
   return fetch(CLAUDE_PROXY,{method:"POST",headers:{"Content-Type":"application/json"},
