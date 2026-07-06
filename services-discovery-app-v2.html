@@ -81,6 +81,14 @@ textarea{resize:vertical;min-height:80px}
 @media(max-width:560px){.container,.container-wide{padding:24px 18px}.review-grid{grid-template-columns:1fr}}
 .t-logo svg,.t-logo img{display:block}
 footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color:var(--gray)}
+.welcome-hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 70%);padding:32px 36px;color:#fff}
+.welcome-hero .hero-logo{display:block;margin-bottom:14px}
+.welcome-hero h1{color:#fff;font-size:30px;margin:0}
+.welcome-content{padding:28px 36px 36px}
+.welcome-content>p{font-size:14px;color:var(--gray)}
+.wc-h{color:var(--blue);font-size:16px;margin:20px 0 8px}
+.wc-list{padding-left:20px;color:var(--gray);font-size:14px}
+.wc-list li{margin-bottom:6px}
 .note-box{background:var(--blue-l);border-left:4px solid var(--blue);padding:14px 16px;margin-bottom:18px;font-size:13.5px;color:var(--gray);line-height:1.5}
 .cat-subhead{font-size:15px;color:var(--navy);margin:4px 0 6px}
 .cat-group-h{font-size:11.5px;font-weight:700;color:var(--blue);letter-spacing:.6px;text-transform:uppercase;margin:20px 0 10px}
@@ -102,39 +110,33 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
 
 <!-- ============ WELCOME / VALUE PAGE ============ -->
 <div id="page-welcome" class="page active">
-<div class="container">
-  <div class="logo-row">
-    <div class="t-logo">
-      <img src="assets/tricentis-logo.png" alt="Tricentis" height="28">
-    </div>
-    <span class="version-tag">SERVICES DISCOVERY</span>
+<div class="container" style="padding:0;overflow:hidden">
+  <div class="welcome-hero">
+    <img src="assets/tricentis-logo-white.svg" alt="Tricentis" height="24" class="hero-logo">
+    <h1>Services discovery</h1>
   </div>
+  <div class="welcome-content">
+    <p>This guided experience walks you through a simple discovery and scoping journey. In just a few steps, we capture your goals, constraints, and priorities, then turn your inputs into a clear, tailored recommendation.</p>
 
-  <div class="welcome-banner">
-    <h1>Services Discovery</h1>
-    <p>This short guided questionnaire walks you through a services scoping and discovery process. Based on your answers, we'll generate a personalized services proposal, executive summary, and supporting materials — so you can understand our initial recommendation, sizing, and scope before we ever get on a call.</p>
-    <p>Our data shows that customers who invest in services implement faster, accelerate time to value, and achieve ROI milestones faster.</p>
+    <h3 class="wc-h">What you get:</h3>
+    <ul class="wc-list">
+      <li>A personalized services proposal</li>
+      <li>An executive summary to share with stakeholders</li>
+      <li>Recommended scope, sizing, and approach</li>
+      <li>Supporting materials to help you move forward with confidence</li>
+    </ul>
+
+    <h3 class="wc-h">The benefits of services:</h3>
+    <ul class="wc-list">
+      <li>Faster time to value from day one</li>
+      <li>More productive teams with expert guidance</li>
+      <li>Fewer defects and less rework</li>
+      <li>Teams that can run and scale with confidence</li>
+    </ul>
+
+    <button class="btn btn-primary" id="welcome-start" data-action="start" style="margin-top:22px">Get started →</button>
+    <button class="btn btn-secondary btn-block" data-action="dev-fill" style="margin-top:24px;font-size:12px">🧪 Dev: jump to sample proposal (testing)</button>
   </div>
-
-  <div class="value-grid">
-    <div class="value-card"><div class="vc-stat">Faster</div><div class="vc-label">time-to-value with guided implementation and onboarding from day one</div></div>
-    <div class="value-card"><div class="vc-stat">Higher</div><div class="vc-label">team productivity through expert enablement and best practices</div></div>
-    <div class="value-card"><div class="vc-stat">Fewer</div><div class="vc-label">defects and less rework with proven quality engineering methods</div></div>
-    <div class="value-card"><div class="vc-stat">Stronger</div><div class="vc-label">long-term capability — your team learns to run and scale optimally</div></div>
-  </div>
-
-  <div class="q-label">To get started — are you considering a new Tricentis product, or looking for services to support an existing implementation?</div>
-  <button class="opt-card" data-action="set-type" data-value="new">
-    <div class="radio"></div>
-    <div><div class="opt-title">New product</div><div class="opt-desc">I'm evaluating or purchasing a new Tricentis product.</div></div>
-  </button>
-  <button class="opt-card" data-action="set-type" data-value="existing">
-    <div class="radio"></div>
-    <div><div class="opt-title">Existing implementation</div><div class="opt-desc">I already use Tricentis and want additional services or support.</div></div>
-  </button>
-
-  <button class="btn btn-primary btn-block" id="welcome-start" data-action="start" disabled>Get started →</button>
-  <button class="btn btn-secondary btn-block" data-action="dev-fill" style="margin-top:10px;font-size:12px">🧪 Dev: jump to sample proposal (testing)</button>
 </div>
 <footer>Tricentis Services Discovery</footer>
 </div>
@@ -214,7 +216,7 @@ footer{max-width:680px;margin:14px auto 0;text-align:center;font-size:11px;color
 var CLAUDE_PROXY = "https://api.anthropic.com/v1/messages"; // ← replace with Cloudflare Worker URL on Netlify
 
 var PRODUCTS = ["Tosca","qTest","NeoLoad","LiveCompare","SeaLights","AI Workspace / Agentic Solutions","Vera"];
-var GOALS = ["Accelerate implementation","Increase test automation","Improve release quality","Upskill / enable our team","QA strategy & maturity","Performance & scalability","SAP / ERP transformation support","Compliance & validation (GxP)","Unsure"];
+var GOALS = ["Accelerate implementation","Increase test automation","Improve release quality","Upskill / enable our team","QA strategy & maturity","Performance & scalability","SAP / ERP transformation support","Compliance & validation (GxP)","Unsure","Other"];
 
 /* ---- Internal sizing constants (hours are never shown to the customer) ---- */
 var HOURS_PER_DAY = 8;   // working hours per day
@@ -275,7 +277,7 @@ var state = {
   products:[], deployments:{}, erpProject:null, erpApproach:null, erpSystem:"",
   hasQAOrg:null, teamStructure:"", teamSize:"", numTeams:"", maturity:null, currentTools:"",
   siInvolved:null, siScope:"", qtestMigration:null,
-  goals:[], timeline:null, notes:"", selectedServices:[]
+  goals:[], goalsOther:"", timeline:null, notes:"", selectedServices:[]
 };
 var DEPLOY_PRODUCTS = ["Tosca","qTest","LiveCompare","Vera"]; // products that need an on-prem / cloud choice
 var stepIdx = 0;
@@ -283,6 +285,12 @@ var ai = null; // AI-generated narrative
 
 /* ---------------- steps ---------------- */
 var steps = [
+  { title:"Let's get started", render:function(){ return ''
+    +'<div class="q-label" style="margin-top:0">Are you considering a new Tricentis product, or looking for services to support an existing implementation?</div>'
+    +optCard("New product","I'm evaluating or purchasing a new Tricentis product.","ctype","new",state.customerType==="new")
+    +optCard("Existing implementation","I already use Tricentis and want additional services or support.","ctype","existing",state.customerType==="existing");
+  }, collect:function(){}, valid:function(){ return !!state.customerType; } },
+
   { title:"Tell us about you", render:function(){ return ''
     +'<div class="q-label">Company name *</div><input type="text" id="f-company" value="'+esc(state.company)+'" placeholder="Acme Corp">'
     +'<div class="q-label">Your name *</div><input type="text" id="f-contact" value="'+esc(state.contact)+'" placeholder="Jane Smith">'
@@ -290,7 +298,7 @@ var steps = [
   }, collect:function(){ state.company=val("f-company"); state.contact=val("f-contact"); state.email=val("f-email"); },
      valid:function(){ return val("f-company") && val("f-contact") && /\S+@\S+\.\S+/.test(val("f-email")); } },
 
-  { title:"Which Tricentis products are in scope?", render:function(){ var h=''
+  { title:"Which Tricentis products should we consider?", render:function(){ var h=''
     +'<div class="note-box">All new product implementations will go through our Smart Start Onboarding Program, covering initial deployment, configuration, and basic training.</div>'
     +'<p class="hint" style="margin-top:0">Select all that apply — '+(state.customerType==='new'?'products you\'re purchasing or evaluating.':'products you own or are adding.')+'</p>'
     +'<div class="chip-row">'+PRODUCTS.map(function(p){return chip(p, state.products.indexOf(p)>=0, "toggle-product");}).join("")+'</div>';
@@ -303,7 +311,7 @@ var steps = [
     return h;
   }, collect:function(){}, valid:function(){ return state.products.length>0 && DEPLOY_PRODUCTS.every(function(p){ return state.products.indexOf(p)<0 || state.deployments[p]; }); } },
 
-  { title:"Is this tied to an ERP project?", render:function(){ var h=''
+  { title:"Is this related to a major business transformation such as an Enterprise Resource Planning (ERP) Implementation/Upgrade Project?", render:function(){ var h=''
     +'<p class="hint" style="margin-top:0">For example, an SAP S/4HANA migration, Oracle, Salesforce, or other major ERP initiative.</p>'
     +optCard("Yes","This work supports an ERP project or transformation.","erp","yes",state.erpProject==="yes")
     +optCard("No","No ERP project involved.","erp","no",state.erpProject==="no");
@@ -348,11 +356,12 @@ var steps = [
   { title:"Goals & timeline", render:function(){ return ''
     +'<div class="q-label" style="margin-top:0">What are your goals and objectives within the next 6–12 months? Select all that apply.</div>'
     +'<div class="chip-row">'+GOALS.map(function(g){return chip(g, state.goals.indexOf(g)>=0, "toggle-goal");}).join("")+'</div>'
+    +(state.goals.indexOf("Other")>=0?'<div class="q-label">Please tell us more about your other goals</div><textarea id="f-goalsother" placeholder="Describe your additional goals or objectives…">'+esc(state.goalsOther)+'</textarea>':'')
     +'<div class="q-label">What are your project timelines?</div>'
     +'<p class="hint">Please share your preferred start date for implementation, preferred completion date for implementation, and a few brief details around your target goals — e.g. "We\'d like to achieve X% automation in X months," or "We\'d like to fully migrate our assets onto the Tricentis platform by [month]."</p>'
     +'<textarea id="f-timeline" placeholder="Preferred start date, preferred completion date, and target goals…">'+esc(state.timeline)+'</textarea>'
     +'<div class="q-label">Anything else we should know?</div><textarea id="f-notes" placeholder="Constraints, upcoming milestones, compliance needs, etc.">'+esc(state.notes)+'</textarea>';
-  }, collect:function(){ state.timeline=val("f-timeline"); state.notes=val("f-notes"); }, valid:function(){ return state.goals.length>0; } },
+  }, collect:function(){ state.timeline=val("f-timeline"); state.notes=val("f-notes"); if(state.goals.indexOf("Other")>=0){ state.goalsOther=val("f-goalsother"); } }, valid:function(){ return state.goals.length>0; } },
 
   { title:"Additional services", render:function(){
     var svcs=applicableServices();
@@ -395,7 +404,7 @@ function renderStep(){
   $("step-content").innerHTML=s.render();
   $("step-counter").textContent=(stepIdx+1)+" of "+steps.length;
   $("progress-fill").style.width=Math.round(((stepIdx+1)/steps.length)*100)+"%";
-  $("btn-back").style.visibility=stepIdx===0?"hidden":"visible";
+  $("btn-back").style.visibility="visible"; // Back is always available (step 0 returns to the welcome page)
   $("btn-next").textContent=stepIdx===steps.length-1?"Generate my proposal →":"Continue →";
   clearErrors();
   bindInputs(); updateNext();
@@ -422,21 +431,21 @@ function showErrors(){
 document.addEventListener("click",function(e){
   var t=e.target.closest("[data-action]"); if(!t)return;
   var a=t.getAttribute("data-action"), v=t.getAttribute("data-value");
-  if(a==="set-type"){ state.customerType=v; document.querySelectorAll('[data-action="set-type"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); $("welcome-start").disabled=false; }
   if(a==="start"){ stepIdx=0; showPage("page-wizard"); renderStep(); }
   if(a==="dev-fill"){ devFill(); }
-  if(a==="back"){ if(stepIdx>0){steps[stepIdx].collect();stepIdx--;renderStep();} }
+  if(a==="back"){ steps[stepIdx].collect(); if(stepIdx>0){stepIdx--;renderStep();} else {showPage("page-welcome");} }
   if(a==="next"){ steps[stepIdx].collect(); if(!steps[stepIdx].valid()){showErrors();return;}
     clearErrors();
     if(stepIdx<steps.length-1){stepIdx++;renderStep();} else {generateResults();} }
   if(a==="toggle-product"){ toggleArr(state.products,v); if(state.products.indexOf(v)<0){ delete state.deployments[v]; if(v==="qTest"){state.qtestMigration=null;} if(v==="Tosca"){state.maturity=null;} } renderStep(); }
   if(a==="set-deploy"){ var dp=t.getAttribute("data-product"); state.deployments[dp]=v; document.querySelectorAll('[data-action="set-deploy"][data-product="'+dp+'"]').forEach(function(b){b.classList.toggle("selected",b.getAttribute("data-value")===v);}); updateNext(); }
-  if(a==="toggle-goal"){ toggleArr(state.goals,v); t.classList.toggle("selected"); updateNext(); }
+  if(a==="toggle-goal"){ toggleArr(state.goals,v); if(v==="Other"){ steps[stepIdx].collect(); if(state.goals.indexOf("Other")<0){state.goalsOther="";} renderStep(); } else { t.classList.toggle("selected"); updateNext(); } }
   if(a==="set-maturity"){ state.maturity=v; selectOne('[data-action="set-maturity"]',v); updateNext(); }
   if(a==="opt"){ var g=t.getAttribute("data-group");
     if(g==="erp"){ state.erpProject=v; if(v==="no"){state.erpApproach=null;} renderStep(); }
     if(g==="erp-approach"){ state.erpApproach=v; selectGroup("erp-approach",v); updateNext(); }
     if(g==="qaorg"){ steps[stepIdx].collect(); state.hasQAOrg=v; if(v!=="yes"){state.teamStructure="";} renderStep(); }
+    if(g==="ctype"){ state.customerType=v; selectGroup("ctype",v); updateNext(); }
   }
   if(a==="set-si"){ steps[stepIdx].collect(); state.siInvolved=v; if(v!=="Yes"){state.siScope="";} renderStep(); }
   if(a==="set-qtest-migration"){ state.qtestMigration=v; selectOne('[data-action="set-qtest-migration"]',v); updateNext(); }
@@ -509,7 +518,7 @@ function shareByEmail(){
   if(state.currentTools) L.push("- Current tools: "+state.currentTools);
   if(state.siInvolved) L.push("- Systems integrator involved: "+state.siInvolved+(state.siScope?" — scope: "+state.siScope:""));
   if(state.qtestMigration) L.push("- qTest legacy migration (audit/compliance): "+state.qtestMigration);
-  L.push("- Goals: "+state.goals.join(", "));
+  L.push("- Goals: "+state.goals.join(", ")+(state.goalsOther?" (Other: "+state.goalsOther+")":""));
   if(state.timeline) L.push("- Timeline: "+state.timeline);
   if(state.notes) L.push("- Notes: "+state.notes);
   L.push("");
@@ -559,7 +568,7 @@ function fetchNarrative(recs){
     +"\nQA org today: "+state.hasQAOrg+(state.teamStructure?" (team structure: "+state.teamStructure+")":"")+" | Maturity: "+(state.maturity||"n/a")+" | Team size: "+(state.teamSize||"n/a")+" | Teams in initial implementation: "+(state.numTeams||"n/a")+" | Current tools: "+(state.currentTools||"n/a")
     +"\nSystems integrator: "+(state.siInvolved||"n/a")+(state.siScope?" — scope: "+state.siScope:"")
     +"\nqTest legacy migration for audit/compliance: "+(state.qtestMigration||"n/a")
-    +"\nGoals: "+state.goals.join(", ")+" | Timeline: "+(state.timeline||"n/a")+" | Notes: "+(state.notes||"n/a")
+    +"\nGoals: "+state.goals.join(", ")+(state.goalsOther?" (Other: "+state.goalsOther+")":"")+" | Timeline: "+(state.timeline||"n/a")+" | Notes: "+(state.notes||"n/a")
     +"\nRecommended: "+recs.map(function(r){return r.name;}).join("; ")
     +(state.selectedServices.length?"\nCatalogue services the customer selected: "+selectedServices().map(function(s){return "#"+s.id+" "+s.name;}).join("; "):"");
   return fetch(CLAUDE_PROXY,{method:"POST",headers:{"Content-Type":"application/json"},
